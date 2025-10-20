@@ -1,7 +1,9 @@
 // ===== KONFIGURASI AI =====
-// GANTI 'YOUR_GEMINI_API_KEY' dengan API Key Anda dari https://makersuite.google.com/app/apikey
-const GEMINI_API_KEY = 'AIzaSyAKOq-YHldIzRoMGN8fr4rSwV96zdrNn_s';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+// GANTI dengan API Key BARU dari https://aistudio.google.com/app/apikey
+const GEMINI_API_KEY = 'AIzaSyDWDnINL-ZnEP1nSg9lOvNEfksLcBuycY8'; // ⚠️ GANTI INI!
+
+// Update endpoint ke yang benar
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 // Simulasi database pengguna
 let usersDatabase = [];
@@ -9,8 +11,14 @@ let currentUser = null;
 const GOOGLE_CLIENT_ID = '137570212811-eqkc9tbr9h11u85l25q2fctom0r5lgtv.apps.googleusercontent.com';
 let userActivityData = {};
 
-// ===== FUNGSI AI HELPER =====
+// ===== FUNGSI AI HELPER (DIPERBAIKI) =====
 async function callGeminiAI(prompt) {
+    // Validasi API Key
+    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_NEW_API_KEY_HERE') {
+        console.error('⚠️ API Key Gemini belum diisi!');
+        return '⚠️ Maaf, fitur AI belum dikonfigurasi. Silakan hubungi administrator untuk mengatur API Key.';
+    }
+
     try {
         const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
             method: 'POST',
@@ -25,20 +33,39 @@ async function callGeminiAI(prompt) {
                 }],
                 generationConfig: {
                     temperature: 0.7,
-                    maxOutputTokens: 1000
+                    maxOutputTokens: 1000,
+                    topP: 0.8,
+                    topK: 10
                 }
             })
         });
 
         if (!response.ok) {
-            throw new Error('API request failed');
+            const errorData = await response.json().catch(() => ({}));
+            console.error('API Error:', response.status, errorData);
+            
+            if (response.status === 404) {
+                return '❌ Error: API endpoint tidak ditemukan. Pastikan menggunakan model yang benar (gemini-1.5-flash).';
+            } else if (response.status === 403) {
+                return '❌ Error: API Key tidak valid atau belum diaktifkan. Silakan periksa API Key Anda.';
+            } else if (response.status === 429) {
+                return '⚠️ Terlalu banyak permintaan. Silakan coba lagi dalam beberapa saat.';
+            }
+            
+            throw new Error(`HTTP ${response.status}: ${errorData.error?.message || 'Unknown error'}`);
         }
 
         const data = await response.json();
+        
+        if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+            console.error('Invalid response structure:', data);
+            return '❌ Respons AI tidak valid. Silakan coba lagi.';
+        }
+        
         return data.candidates[0].content.parts[0].text;
     } catch (error) {
         console.error('Error calling Gemini AI:', error);
-        return 'Maaf, AI sedang tidak tersedia. Silakan coba lagi nanti.';
+        return `❌ Maaf, terjadi kesalahan saat menghubungi AI: ${error.message}`;
     }
 }
 
@@ -884,7 +911,7 @@ async function updateFoodDisplay() {
         
         // Calculate BMR and TDEE
         const bmr = Math.round(10 * weight + 6.25 * height - 5 * age + 5);
-        const tdee = Math.round(bmr * 1.55); // Moderate activity
+        const tdee = Math.round(bmr * 1.55);
         
         // Get calorie burn data
         const todaySteps = data.steps.filter(s => new Date(s.date).toDateString() === today)
