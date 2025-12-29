@@ -1,0 +1,2048 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calorie Deficit AI - Health Tracker with Analytics</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="registration-styles.css">
+    
+    <!-- Google Auth & Chart.js Libraries -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Google Auth Configuration -->
+    <meta name="google-signin-client_id" content="137570212811-eqkc9tbr9h11u85l25q2fctom0r5lgtv.apps.googleusercontent.com">
+
+    <!-- SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+<body>
+    <!-- Floating Animated Icons -->
+    <div class="floating-icons">
+        <div class="float-icon" style="left: 10%; top: 20%; animation-delay: 0s;">🏃</div>
+        <div class="float-icon" style="left: 85%; top: 15%; animation-delay: 2s;">🥗</div>
+        <div class="float-icon" style="left: 15%; top: 70%; animation-delay: 4s;">🏋️</div>
+        <div class="float-icon" style="left: 80%; top: 65%; animation-delay: 3s;">🍎</div>
+        <div class="float-icon" style="left: 50%; top: 10%; animation-delay: 1s;">⚡</div>
+        <div class="float-icon" style="left: 20%; top: 85%; animation-delay: 5s;">🥑</div>
+    </div>
+
+    <!-- Landing Page -->
+    <div id="landingPage" class="page active">
+        <div class="background-gradient"></div>
+        <div class="container">
+            <div class="card-auth">
+                <div class="header-section">
+                    <svg class="icon-large animated-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                    </svg>
+                    <h1>Calorie Deficit AI</h1>
+                    <p>Aplikasi kesehatan cerdas dengan AI Personal Trainer dan Analytics</p>
+                </div>
+
+                <div id="loginForm" class="form-container">
+                    <h2>Masuk ke Akun Anda</h2>
+                    
+                    <!-- Google Sign-In Button -->
+                    <div class="google-signin-section">
+                        <div id="g_id_onload"
+                             data-client_id="137570212811-eqkc9tbr9h11u85l25q2fctom0r5lgtv.apps.googleusercontent.com"
+                             data-context="signin"
+                             data-ux_mode="popup"
+                             data-callback="handleGoogleSignIn"
+                             data-auto_prompt="false">
+                        </div>
+                        
+                        <div class="g_id_signin" 
+                             data-type="standard" 
+                             data-shape="rectangular" 
+                             data-theme="outline" 
+                             data-text="signin_with" 
+                             data-size="large" 
+                             data-logo_alignment="left"
+                             data-width="100%">
+                        </div>
+                    </div>
+
+                    <div class="divider">
+                        <span>atau</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" placeholder="nama@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <div id="loginError" class="error-message"></div>
+                    <button class="btn-primary" onclick="handleLogin()">Masuk</button>
+
+                    <p class="switch-form">
+                        Belum punya akun? <a href="#" onclick="toggleForm(); return false;">Daftar Sekarang</a>
+                    </p>
+                </div>
+
+                <!-- ========================================
+                    REGISTER FORM DENGAN PROGRESS STEPS
+                    ======================================== -->
+
+                <div id="registerForm" class="form-container" style="display: none;">
+                    <div class="header-section" style="margin-bottom: 1.5rem;">
+                        <svg class="icon-medium animated-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                        <h2>Buat Akun Baru 🚀</h2>
+                        <p>Lengkapi data untuk memulai perjalanan kesehatan Anda</p>
+                    </div>
+                    
+                    <!-- Google Sign-Up Button -->
+                    <div class="google-signin-section">
+                        <button class="btn-google" onclick="initGoogleSignUp()">
+                            <svg class="google-icon" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                            Daftar dengan Google
+                        </button>
+                    </div>
+
+                    <div class="divider">
+                        <span>atau lengkapi form di bawah</span>
+                    </div>
+
+                    <!-- Progress Indicator -->
+                    <div class="progress-steps" id="regProgressSteps">
+                        <div class="step active">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Akun</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Data Pribadi</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-label">Data Fisik</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-label">Target</div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 1: AKUN -->
+                    <div class="form-section" id="regSection1">
+                        <h3 class="section-title">📧 Informasi Akun</h3>
+                        
+                        <div class="form-group">
+                            <label>Email <span class="required">*</span></label>
+                            <input type="email" id="regEmail" placeholder="nama@email.com" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Password <span class="required">*</span></label>
+                            <input type="password" id="regPassword" placeholder="Minimal 6 karakter" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Konfirmasi Password <span class="required">*</span></label>
+                            <input type="password" id="regPasswordConfirm" placeholder="Ketik ulang password" required>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: DATA PRIBADI -->
+                    <div class="form-section" id="regSection2">
+                        <h3 class="section-title">👤 Data Pribadi</h3>
+                        
+                        <div class="form-group">
+                            <label>Nama Lengkap <span class="required">*</span></label>
+                            <input type="text" id="regNamaLengkap" placeholder="Nama lengkap Anda" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Jenis Kelamin <span class="required">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="jenisKelamin" value="laki-laki" required>
+                                    <span class="radio-label">
+                                        <span class="radio-icon">👨</span>
+                                        Laki-laki
+                                    </span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="jenisKelamin" value="perempuan">
+                                    <span class="radio-label">
+                                        <span class="radio-icon">👩</span>
+                                        Perempuan
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tempat Lahir <span class="required">*</span></label>
+                                <input type="text" id="regTempatLahir" placeholder="Kota kelahiran" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Tanggal Lahir <span class="required">*</span></label>
+                                <input type="date" id="regTanggalLahir" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Golongan Darah <span class="required">*</span></label>
+                                <select id="regGolonganDarah" required>
+                                    <option value="">Pilih</option>
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="AB">AB</option>
+                                    <option value="O">O</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Nomor WhatsApp <span class="required">*</span></label>
+                                <input type="tel" id="regNomorWA" placeholder="08123456789" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: DATA FISIK -->
+                    <div class="form-section" id="regSection3">
+                        <h3 class="section-title">📏 Data Fisik</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tinggi Badan <span class="required">*</span></label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="regTinggiBadan" placeholder="170" min="100" max="250" required>
+                                    <span class="unit">cm</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Berat Badan Saat Ini <span class="required">*</span></label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="regBeratBadanAwal" placeholder="70" min="30" max="300" step="0.1" required>
+                                    <span class="unit">kg</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 4: GOAL SETTING -->
+                    <div class="form-section goal-section" id="regSection4">
+                        <h3 class="section-title">🎯 Target Berat Badan Anda</h3>
+                        <p class="section-description">Pilih tujuan Anda untuk mendapatkan rekomendasi kalori yang tepat</p>
+                        
+                        <div class="form-group">
+                            <label>Tujuan Anda <span class="required">*</span></label>
+                            <div class="goal-options">
+                                <label class="goal-card">
+                                    <input type="radio" name="goal" value="turun" required onchange="updateGoalInfo()">
+                                    <span class="goal-content">
+                                        <span class="goal-icon">📉</span>
+                                        <span class="goal-title">Turun Berat Badan</span>
+                                        <span class="goal-desc">Defisit kalori untuk menurunkan BB</span>
+                                    </span>
+                                </label>
+                                
+                                <label class="goal-card">
+                                    <input type="radio" name="goal" value="naik" onchange="updateGoalInfo()">
+                                    <span class="goal-content">
+                                        <span class="goal-icon">📈</span>
+                                        <span class="goal-title">Naik Berat Badan</span>
+                                        <span class="goal-desc">Surplus kalori untuk menambah BB</span>
+                                    </span>
+                                </label>
+                                
+                                <label class="goal-card">
+                                    <input type="radio" name="goal" value="maintain" onchange="updateGoalInfo()">
+                                    <span class="goal-content">
+                                        <span class="goal-icon">⚖️</span>
+                                        <span class="goal-title">Maintain Berat Badan</span>
+                                        <span class="goal-desc">Pertahankan BB ideal Anda</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="targetWeightGroup" style="display: none;">
+                            <label>Berat Badan Target <span class="required">*</span></label>
+                            <div class="input-with-unit">
+                                <input type="number" id="regBeratBadanTarget" placeholder="65" min="30" max="300" step="0.1">
+                                <span class="unit">kg</span>
+                            </div>
+                        </div>
+
+                        <!-- Preview Kalori -->
+                        <div class="goal-preview" id="goalPreview" style="display: none;">
+                            <div class="preview-header">
+                                <span class="preview-icon">🎯</span>
+                                <h4>Ringkasan Target Anda</h4>
+                            </div>
+                            <div class="preview-content">
+                                <div class="preview-item">
+                                    <span class="preview-label">Berat Badan Awal:</span>
+                                    <span class="preview-value" id="previewBBAwal">-</span>
+                                </div>
+                                <div class="preview-item">
+                                    <span class="preview-label">Berat Badan Target:</span>
+                                    <span class="preview-value" id="previewBBTarget">-</span>
+                                </div>
+                                <div class="preview-item">
+                                    <span class="preview-label">Selisih:</span>
+                                    <span class="preview-value highlight" id="previewSelisih">-</span>
+                                </div>
+                                <div class="preview-item">
+                                    <span class="preview-label">Kalori Harian Target:</span>
+                                    <span class="preview-value highlight" id="previewKalori">-</span>
+                                </div>
+                                <div class="preview-note" id="previewNote">
+                                    Kalori akan dihitung berdasarkan data Anda setelah mendaftar
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="registerError" class="error-message"></div>
+                    <button class="btn-primary btn-large" onclick="handleRegisterComplete()">
+                        <span>✅ Simpan & Mulai</span>
+                    </button>
+
+                    <p class="switch-form">
+                        Sudah punya akun? <a href="#" onclick="toggleForm(); return false;">Masuk</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete Profile Page (untuk Google Sign-Up) -->
+    <div id="completeProfilePage" class="page">
+        <div class="background-gradient"></div>
+        <div class="container">
+            <div class="card-auth" style="max-width: 700px;">
+                <div class="header-section">
+                    <svg class="icon-medium animated-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    <h2>Selamat Datang, <span id="googleUserName"></span>! 👋</h2>
+                    <p>Lengkapi profil Anda untuk memulai perjalanan kesehatan</p>
+                </div>
+
+                <!-- Progress Indicator -->
+                <div class="progress-steps">
+                    <div class="step active">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Data Pribadi</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Data Fisik</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Target</div>
+                    </div>
+                </div>
+
+                <form id="completeProfileForm" class="form-container">
+                    <!-- SECTION 1: DATA PRIBADI -->
+                    <div class="form-section">
+                        <h3 class="section-title">👤 Data Pribadi</h3>
+                        
+                        <div class="form-group">
+                            <label>Nama Lengkap <span class="required">*</span></label>
+                            <input type="text" id="googleNamaLengkap" placeholder="Nama lengkap Anda" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Jenis Kelamin <span class="required">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="googleJenisKelamin" value="laki-laki" required>
+                                    <span class="radio-label">
+                                        <span class="radio-icon">👨</span>
+                                        Laki-laki
+                                    </span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="googleJenisKelamin" value="perempuan">
+                                    <span class="radio-label">
+                                        <span class="radio-icon">👩</span>
+                                        Perempuan
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tempat Lahir <span class="required">*</span></label>
+                                <input type="text" id="googleTempatLahir" placeholder="Kota kelahiran" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Tanggal Lahir <span class="required">*</span></label>
+                                <input type="date" id="googleTanggalLahir" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Golongan Darah <span class="required">*</span></label>
+                                <select id="googleGolonganDarah" required>
+                                    <option value="">Pilih</option>
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="AB">AB</option>
+                                    <option value="O">O</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Nomor WhatsApp <span class="required">*</span></label>
+                                <input type="tel" id="googleNomorWA" placeholder="08123456789" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: DATA FISIK -->
+                    <div class="form-section">
+                        <h3 class="section-title">📏 Data Fisik</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tinggi Badan <span class="required">*</span></label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="googleTinggiBadan" placeholder="170" min="100" max="250" required>
+                                    <span class="unit">cm</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Berat Badan Saat Ini <span class="required">*</span></label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="googleBeratBadanAwal" placeholder="70" min="30" max="300" step="0.1" required>
+                                    <span class="unit">kg</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: GOAL SETTING -->
+                    <div class="form-section goal-section">
+                        <h3 class="section-title">🎯 Target Berat Badan Anda</h3>
+                        <p class="section-description">Pilih tujuan Anda untuk mendapatkan rekomendasi kalori yang tepat</p>
+                        
+                        <div class="form-group">
+                            <label>Tujuan Anda <span class="required">*</span></label>
+                            <div class="goal-options">
+                                <label class="goal-card">
+                                    <input type="radio" name="googleGoal" value="turun" required onchange="updateGoogleGoalInfo()">
+                                    <span class="goal-content">
+                                        <span class="goal-icon">📉</span>
+                                        <span class="goal-title">Turun Berat Badan</span>
+                                        <span class="goal-desc">Defisit kalori untuk menurunkan BB</span>
+                                    </span>
+                                </label>
+                                
+                                <label class="goal-card">
+                                    <input type="radio" name="googleGoal" value="naik" onchange="updateGoogleGoalInfo()">
+                                    <span class="goal-content">
+                                        <span class="goal-icon">📈</span>
+                                        <span class="goal-title">Naik Berat Badan</span>
+                                        <span class="goal-desc">Surplus kalori untuk menambah BB</span>
+                                    </span>
+                                </label>
+                                
+                                <label class="goal-card">
+                                    <input type="radio" name="googleGoal" value="maintain" onchange="updateGoogleGoalInfo()">
+                                    <span class="goal-content">
+                                        <span class="goal-icon">⚖️</span>
+                                        <span class="goal-title">Maintain Berat Badan</span>
+                                        <span class="goal-desc">Pertahankan BB ideal Anda</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="googleTargetWeightGroup" style="display: none;">
+                            <label>Berat Badan Target <span class="required">*</span></label>
+                            <div class="input-with-unit">
+                                <input type="number" id="googleBeratBadanTarget" placeholder="65" min="30" max="300" step="0.1">
+                                <span class="unit">kg</span>
+                            </div>
+                        </div>
+
+                        <!-- Preview Kalori -->
+                        <div class="goal-preview" id="googleGoalPreview" style="display: none;">
+                            <div class="preview-header">
+                                <span class="preview-icon">🎯</span>
+                                <h4>Ringkasan Target Anda</h4>
+                            </div>
+                            <div class="preview-content">
+                                <div class="preview-item">
+                                    <span class="preview-label">Berat Badan Awal:</span>
+                                    <span class="preview-value" id="googlePreviewBBAwal">-</span>
+                                </div>
+                                <div class="preview-item">
+                                    <span class="preview-label">Berat Badan Target:</span>
+                                    <span class="preview-value" id="googlePreviewBBTarget">-</span>
+                                </div>
+                                <div class="preview-item">
+                                    <span class="preview-label">Selisih:</span>
+                                    <span class="preview-value highlight" id="googlePreviewSelisih">-</span>
+                                </div>
+                                <div class="preview-item">
+                                    <span class="preview-label">Kalori Harian Target:</span>
+                                    <span class="preview-value highlight" id="googlePreviewKalori">-</span>
+                                </div>
+                                <div class="preview-note" id="googlePreviewNote">
+                                    Kalori akan dihitung berdasarkan data Anda setelah menyimpan
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="completeProfileError" class="error-message"></div>
+                    <button type="submit" class="btn-primary btn-large">
+                        <span>✅ Simpan & Mulai</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Data Page -->
+    <div id="inputDataPage" class="page">
+        <div class="background-gradient"></div>
+        <div class="container">
+            <div class="card-input">
+                <div class="header-section">
+                    <svg class="icon-medium animated-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    <h2>Lengkapi Profil Kesehatan</h2>
+                    <p>Data ini diperlukan untuk memberikan rekomendasi AI yang akurat</p>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nama Lengkap</label>
+                        <input type="text" id="namaLengkap" placeholder="Nama lengkap" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tempat Lahir</label>
+                        <input type="text" id="tempatLahir" placeholder="Kota kelahiran" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Lahir</label>
+                        <input type="date" id="tanggalLahir" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Golongan Darah</label>
+                        <select id="golonganDarah" required>
+                            <option value="">Pilih golongan darah</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="AB">AB</option>
+                            <option value="O">O</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tinggi Badan (cm)</label>
+                        <input type="number" id="tinggiBadan" placeholder="170" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Berat Badan (kg)</label>
+                        <input type="number" id="beratBadan" placeholder="70" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nomor WhatsApp</label>
+                    <input type="tel" id="nomorWA" placeholder="08123456789" required>
+                </div>
+                <button class="btn-primary btn-large" onclick="saveDataAndGoToDashboard()">Simpan & Mulai Tracking</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage" class="page">
+        <!-- FIXED HAMBURGER BUTTON - Outside navbar for guaranteed clicks -->
+        <button id="fixedHamburger" class="fixed-hamburger-btn" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <svg class="icon-nav" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                    </svg>
+                    <span>Calorie Deficit AI</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#" id="nav-dashboard" class="nav-link active" onclick="showDashboard()">🏠 Dashboard</a>
+                    <a href="#" id="nav-analytics" class="nav-link" onclick="showAnalytics()">📊 Analytics</a>
+                    <a href="#" id="nav-harian" class="nav-link" onclick="showHarian()">📝 Input Harian</a>
+                </div>
+                <div class="nav-actions">
+                    <div class="user-info">
+                        <img id="userPhoto" class="user-avatar" src="" alt="User" style="display: none;">
+                        <span id="userEmailDisplay"></span>
+                    </div>
+                    <button class="btn-icon" onclick="toggleProfile()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </button>
+                    <button class="btn-logout" onclick="logout()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Mobile Menu Overlay -->
+        <div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+        
+        <!-- Mobile Navigation Menu -->
+        <nav class="mobile-nav-menu">
+            <a href="#" class="nav-link active" onclick="showDashboard(); closeMobileMenu();">
+                <span class="nav-icon">🏠</span> Dashboard
+            </a>
+            <a href="#" class="nav-link" onclick="showAnalytics(); closeMobileMenu();">
+                <span class="nav-icon">📊</span> Analytics
+            </a>
+            <a href="#" class="nav-link" onclick="showHarian(); closeMobileMenu();">
+                <span class="nav-icon">📝</span> Input Harian
+            </a>
+            <a href="#" class="nav-link" onclick="toggleProfile(); closeMobileMenu();">
+                <span class="nav-icon">👤</span> Profil
+            </a>
+            
+            <div class="mobile-user-section">
+                <div class="mobile-user-info">
+                    <img id="mobileUserPhoto" class="user-avatar" src="" alt="User" style="display: none;">
+                    <div>
+                        <div id="mobileUserName" style="font-weight: 600; color: #1f2937;"></div>
+                        <div id="mobileUserEmail" class="user-email"></div>
+                    </div>
+                </div>
+                <button class="mobile-logout-btn" onclick="logout()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </nav>
+
+        <!-- DASHBOARD CONTENT -->
+        <div id="dashboardContent" class="content active">
+            <div class="dashboard-content">
+                <div class="welcome-section">
+                    <h1>🏠 Dashboard Kesehatan AI</h1>
+                    <p>Pantau aktivitas harian Anda dengan bantuan AI Personal Trainer</p>
+                </div>
+                
+                <!-- Quick Stats Overview -->
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="todayCaloriesBurned">0</span>
+                            <span class="stat-label">Kalori Terbakar</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="weeklyGoalProgress">0%</span>
+                            <span class="stat-label">Target Mingguan</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="streakDays">0</span>
+                            <span class="stat-label">Hari Beruntun</span>
+                        </div>
+                    </div>
+                </div>
+                
+                                <!-- ========== WEIGHT TRACKER SECTION ========== -->
+                <div class="weight-tracker-section">
+                    <div class="weight-tracker-card">
+                        <!-- Header -->
+                        <div class="weight-header">
+                            <div class="weight-title">
+                                <span class="weight-icon">⚖️</span>
+                                <h3>Tracking Berat Badan</h3>
+                            </div>
+                            <button class="btn-weight-input" onclick="window.openWeightInputModal ? window.openWeightInputModal() : openWeightInputModal()">
+                                ➕ Input Berat
+                            </button>
+                        </div>
+                        
+                        <!-- Current Status -->
+                        <div class="weight-current-status">
+                            <div class="weight-stat-box">
+                                <div class="stat-label-small">Berat Awal</div>
+                                <div class="stat-value-medium" id="weightInitial">-</div>
+                                <div class="stat-unit-small">kg</div>
+                            </div>
+                            
+                            <div class="weight-progress-arrow">
+                                <div class="progress-indicator" id="weightTrend">
+                                    <span class="trend-icon">→</span>
+                                    <span class="trend-text">Tetap</span>
+                                </div>
+                                <div class="progress-change" id="weightChange">0 kg</div>
+                            </div>
+                            
+                            <div class="weight-stat-box highlight">
+                                <div class="stat-label-small">Berat Sekarang</div>
+                                <div class="stat-value-large" id="weightCurrent">-</div>
+                                <div class="stat-unit-small">kg</div>
+                            </div>
+                            
+                            <div class="weight-progress-arrow">
+                                <div class="progress-indicator">
+                                    <span class="trend-icon">🎯</span>
+                                </div>
+                                <div class="progress-remaining" id="weightRemaining">Sisa: - kg</div>
+                            </div>
+                            
+                            <div class="weight-stat-box">
+                                <div class="stat-label-small">Target</div>
+                                <div class="stat-value-medium" id="weightTarget">-</div>
+                                <div class="stat-unit-small">kg</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Goal Status Badge -->
+                        <div class="weight-goal-badge" id="weightGoalBadge">
+                            <span class="badge-icon">🎯</span>
+                            <span class="badge-text" id="weightGoalText">Tujuan: Maintain Berat Badan</span>
+                        </div>
+                        
+                        <!-- Mini Chart -->
+                        <div class="weight-chart-mini">
+                            <h4>📈 Progress 7 Hari Terakhir</h4>
+                            <div class="chart-container-mini">
+                                <canvas id="weightMiniChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Recent History -->
+                        <div class="weight-history-preview">
+                            <div class="history-header">
+                                <h4>📅 Riwayat Terbaru</h4>
+                                <button class="btn-text" onclick="openWeightHistoryModal()">Lihat Semua →</button>
+                            </div>
+                            <div id="weightHistoryList" class="history-list-mini">
+                                <div class="no-data-message">
+                                    <span class="no-data-icon">📝</span>
+                                    <p>Belum ada data berat badan.</p>
+                                    <p class="no-data-hint">Klik "Input Berat" untuk mulai tracking!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Cards Grid -->
+                <div class="features-grid">
+                    <!-- Hitung Langkah Kaki -->
+                    <div class="feature-card" onclick="openStepsModal()">
+                        <div class="feature-icon">👣</div>
+                        <h3>Hitung Langkah</h3>
+                        <p>Track langkah harian dengan AI</p>
+                        <div class="feature-stat">
+                            <span class="stat-value" id="todaySteps">0</span>
+                            <span class="stat-label">langkah hari ini</span>
+                        </div>
+                        <div class="progress-mini">
+                            <div class="progress-fill" id="stepsProgress"></div>
+                        </div>
+                    </div>
+
+                    <!-- Hitung Lari -->
+                    <div class="feature-card" onclick="openRunningModal()">
+                        <div class="feature-icon">🏃</div>
+                        <h3>Track Lari</h3>
+                        <p>Analisis jarak lari dengan AI</p>
+                        <div class="feature-stat">
+                            <span class="stat-value" id="todayDistance">0</span>
+                            <span class="stat-label">km hari ini</span>
+                        </div>
+                        <div class="progress-mini">
+                            <div class="progress-fill" id="runningProgress"></div>
+                        </div>
+                    </div>
+
+                    <!-- Hitung Air -->
+                    <div class="feature-card" onclick="openWaterModal()">
+                        <div class="feature-icon">💧</div>
+                        <h3>Hitung Air</h3>
+                        <p>Rekomendasi AI untuk hidrasi</p>
+                        <div class="feature-stat">
+                            <span class="stat-value" id="todayWater">0</span>
+                            <span class="stat-label">liter hari ini</span>
+                        </div>
+                        <div class="progress-mini">
+                            <div class="progress-fill" id="waterProgress"></div>
+                        </div>
+                    </div>
+
+                    <!-- Gym Tracker -->
+                    <div class="feature-card" onclick="openGymModal()">
+                        <div class="feature-icon">🏋️</div>
+                        <h3>Gym Tracker</h3>
+                        <p>Program AI personal trainer</p>
+                        <div class="feature-stat">
+                            <span class="stat-value" id="gymSessions">0</span>
+                            <span class="stat-label">sesi bulan ini</span>
+                        </div>
+                        <div class="progress-mini">
+                            <div class="progress-fill" id="gymProgress"></div>
+                        </div>
+                    </div>
+
+                    <!-- Hitung Tidur -->
+                    <div class="feature-card" onclick="openSleepModal()">
+                        <div class="feature-icon">😴</div>
+                        <h3>Hitung Tidur</h3>
+                        <p>Analisis kualitas tidur AI</p>
+                        <div class="feature-stat">
+                            <span class="stat-value" id="lastSleep">0</span>
+                            <span class="stat-label">jam semalam</span>
+                        </div>
+                        <div class="progress-mini">
+                            <div class="progress-fill" id="sleepProgress"></div>
+                        </div>
+                    </div>
+
+                    <!-- Hitung Makan -->
+                    <div class="feature-card" onclick="openFoodModal()">
+                        <div class="feature-icon">🍽️</div>
+                        <h3>Hitung Makan</h3>
+                        <p>Saran nutrisi lengkap dari AI</p>
+                        <div class="feature-stat">
+                            <span class="stat-value" id="todayCalorieIn">0</span>
+                            <span class="stat-label">kal masuk</span>
+                        </div>
+                        <div class="progress-mini">
+                            <div class="progress-fill" id="calorieProgress"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Summary Chart -->
+                <div class="chart-section">
+                    <h3>📈 Ringkasan Aktivitas Hari Ini</h3>
+                    <div class="chart-container">
+                        <canvas id="dailySummaryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANALYTICS DASHBOARD CONTENT -->
+        <div id="analyticsContent" class="content">
+            <div class="analytics-container">
+                <div class="analytics-header">
+                    <h2>📊 Analytics Dashboard</h2>
+                    <p>Visualisasi lengkap data kesehatan dan insights AI</p>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="analytics-filters">
+                    <button class="filter-btn active" data-period="7days" onclick="changeAnalyticsPeriod('7days')">7 Hari</button>
+                    <button class="filter-btn" data-period="30days" onclick="changeAnalyticsPeriod('30days')">30 Hari</button>
+                    <button class="filter-btn" data-period="90days" onclick="changeAnalyticsPeriod('90days')">3 Bulan</button>
+                    <button class="filter-btn" data-period="custom" onclick="toggleCustomDatePicker()">Custom</button>
+                </div>
+
+                <!-- Custom Date Range Picker -->
+                <div id="customDatePicker" class="custom-date-picker" style="display: none;">
+                    <input type="date" id="startDate" />
+                    <span style="margin: 0 10px;">—</span>
+                    <input type="date" id="endDate" />
+                    <button class="btn-add" onclick="applyCustomDateRange()">Terapkan</button>
+                </div>
+
+                <!-- Overview Cards -->
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>📈 Ringkasan Periode</h3>
+                        <div class="overview-stats">
+                            <div class="stat-item">
+                                <span class="stat-icon">👣</span>
+                                <span class="stat-value" id="periodSteps">0</span>
+                                <span class="stat-label">Total Langkah</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-icon">🏃</span>
+                                <span class="stat-value" id="periodDistance">0</span>
+                                <span class="stat-label">Km Lari</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-icon">💧</span>
+                                <span class="stat-value" id="periodWater">0</span>
+                                <span class="stat-label">Liter Air</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-icon">😴</span>
+                                <span class="stat-value" id="avgSleep">0</span>
+                                <span class="stat-label">Avg Tidur/Hari</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3>🔥 Kalori Balance</h3>
+                        <div class="summary-grid">
+                            <div class="summary-card surplus">
+                                <div class="summary-icon">🍽️</div>
+                                <div class="summary-info">
+                                    <span class="summary-value" id="summaryCalorieIn">0</span>
+                                    <span class="summary-label">Kalori Masuk</span>
+                                </div>
+                            </div>
+                            <div class="summary-card deficit">
+                                <div class="summary-icon">🔥</div>
+                                <div class="summary-info">
+                                    <span class="summary-value" id="summaryCalorieOut">0</span>
+                                    <span class="summary-label">Kalori Keluar</span>
+                                </div>
+                            </div>
+                            <div class="summary-card balance">
+                                <div class="summary-icon">🎯</div>
+                                <div class="summary-info">
+                                    <span class="summary-value" id="summaryDeficit">0</span>
+                                    <span class="summary-label">Net Balance</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-grid">
+                    <!-- Weight Progress Chart -->
+                    <div class="chart-card">
+                        <h3>📉 Trend Aktivitas Harian</h3>
+                        <div class="chart-container">
+                            <canvas id="activityTrendChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Calorie Balance Chart -->
+                    <div class="chart-card">
+                        <h3>⚖️ Balance Kalori</h3>
+                        <div class="chart-container">
+                            <canvas id="calorieBalanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Activity Distribution -->
+                    <div class="chart-card">
+                        <h3>🏃 Distribusi Aktivitas</h3>
+                        <div class="chart-container">
+                            <canvas id="activityDistributionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Comparison -->
+                    <div class="chart-card">
+                        <h3>📊 Perbandingan Mingguan</h3>
+                        <div class="chart-container">
+                            <canvas id="weeklyComparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Insights -->
+                <div class="analytics-card">
+                    <h3>🤖 AI Insights & Rekomendasi</h3>
+                    <div id="analyticsAI" class="ai-box">
+                        <p>Klik tombol di bawah untuk mendapatkan insight mendalam dari AI berdasarkan data analytics Anda!</p>
+                    </div>
+                    <button class="btn-primary" onclick="generateAnalyticsInsight()">🧠 Generate AI Insight</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- HARIAN CONTENT -->
+        <div id="harianContent" class="content">
+            <div class="harian-container">
+                <div class="harian-header">
+                    <h2>📝 Input Harian</h2>
+                    <p>Catat semua aktivitas kesehatan Anda hari ini</p>
+                </div>
+
+                <div class="harian-grid">
+                    <div class="input-card">
+                        <h3>👣 Langkah Hari Ini</h3>
+                        <div class="input-group">
+                            <input type="number" id="harianSteps" placeholder="Jumlah langkah">
+                            <button onclick="saveHarianSteps()">Simpan</button>
+                        </div>
+                    </div>
+
+                    <div class="input-card">
+                        <h3>🏃 Jarak Lari</h3>
+                        <div class="input-group">
+                            <input type="number" step="0.1" id="harianRun" placeholder="Jarak (km)">
+                            <button onclick="saveHarianRun()">Simpan</button>
+                        </div>
+                    </div>
+
+                    <div class="input-card">
+                        <h3>💧 Konsumsi Air</h3>
+                        <div class="input-group">
+                            <input type="number" step="0.1" id="harianWater" placeholder="Liter air">
+                            <button onclick="saveHarianWater()">Simpan</button>
+                        </div>
+                    </div>
+
+                    <div class="input-card">
+                        <h3>😴 Jam Tidur</h3>
+                        <div class="input-group">
+                            <input type="number" step="0.5" id="harianSleep" placeholder="Jam tidur">
+                            <button onclick="saveHarianSleep()">Simpan</button>
+                        </div>
+                    </div>
+
+                    <div class="input-card">
+                        <h3>🏋️ Durasi Gym</h3>
+                        <div class="input-group">
+                            <input type="number" id="harianGym" placeholder="Menit">
+                            <button onclick="saveHarianGym()">Simpan</button>
+                        </div>
+                    </div>
+
+                    <div class="input-card full-width">
+                        <h3>📊 Ringkasan Hari Ini</h3>
+                        <div class="summary-stats" id="harianSummary">
+                            <div class="summary-item">
+                                <span>👣</span>
+                                <span id="summarySteps">0 langkah</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>🏃</span>
+                                <span id="summaryRun">0 km</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>💧</span>
+                                <span id="summaryWater">0 L</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>😴</span>
+                                <span id="summarySleep">0 jam</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>🏋️</span>
+                                <span id="summaryGym">0 menit</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALS SECTION -->
+        
+        <!-- Profile Modal -->
+        <!-- Profile Modal - Wide Version with Edit Feature -->
+        <div id="profileModal" class="modal">
+            <div class="modal-content modal-profile-wide">
+                <button class="modal-close" onclick="toggleProfile()">&times;</button>
+                <h3>👤 Profil Pengguna</h3>
+                
+                <div class="profile-modal-body">
+                    <!-- View Mode -->
+                    <div id="profileViewMode" class="profile-view-mode">
+                        <div class="profile-header-section">
+                            <div class="profile-avatar-large">
+                                <img id="profilePhoto" class="profile-photo-large" src="" alt="Profile" style="display: none;">
+                                <div class="profile-placeholder-large" id="profilePlaceholder">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="profile-name-section">
+                                <h2 id="displayNamaHeader"></h2>
+                                <p id="displayEmailHeader" class="profile-email"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-info-grid">
+                            <div class="profile-info-card">
+                                <div class="info-card-icon">📧</div>
+                                <div class="info-card-content">
+                                    <span class="info-card-label">Email</span>
+                                    <span class="info-card-value" id="displayEmail"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-info-card">
+                                <div class="info-card-icon">👤</div>
+                                <div class="info-card-content">
+                                    <span class="info-card-label">Nama Lengkap</span>
+                                    <span class="info-card-value" id="displayNama"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-info-card">
+                                <div class="info-card-icon">📍</div>
+                                <div class="info-card-content">
+                                    <span class="info-card-label">Tempat Lahir</span>
+                                    <span class="info-card-value" id="displayTempatLahir"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-info-card">
+                                <div class="info-card-icon">🎂</div>
+                                <div class="info-card-content">
+                                    <span class="info-card-label">Tanggal Lahir</span>
+                                    <span class="info-card-value" id="displayTanggalLahir"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-info-card">
+                                <div class="info-card-icon">🩸</div>
+                                <div class="info-card-content">
+                                    <span class="info-card-label">Golongan Darah</span>
+                                    <span class="info-card-value" id="displayGolDar"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-info-card">
+                                <div class="info-card-icon">📏</div>
+                                <div class="info-card-content">
+                                    <span class="info-card-label">Tinggi Badan</span>
+                                    <span class="info-card-value" id="displayTinggi"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-info-card">
+                                <div class="info-card-icon">⚖️</div>
+                                <div class="info-card-content">
+                                    <span class="info-card-label">Berat Badan</span>
+                                    <span class="info-card-value" id="displayBerat"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-info-card">
+                                <div class="info-card-icon">📱</div>
+                                <div class="info-card-content">
+                                    <span class="info-card-label">Nomor WhatsApp</span>
+                                    <span class="info-card-value" id="displayWA"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-actions">
+                            <button class="btn-edit-profile" onclick="switchToEditMode()">
+                                ✏️ Edit Profil
+                            </button>
+                        </div>
+                        
+                        <!-- Data Management Section -->
+                        <div class="data-management-section">
+                            <h4>📊 Data Management</h4>
+                            <div class="data-management-buttons">
+                                <button class="btn-export" onclick="exportUserData()">
+                                    📥 Export Data
+                                </button>
+                                <button class="btn-clear" onclick="clearAllData()">
+                                    🗑️ Clear All Data
+                                </button>
+                            </div>
+                            <p class="data-management-note">
+                                Export untuk backup, Clear untuk reset aplikasi
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Edit Mode -->
+                    <div id="profileEditMode" class="profile-edit-mode" style="display: none;">
+                        <div class="profile-header-section">
+                            <div class="profile-avatar-large">
+                                <img id="profilePhotoEdit" class="profile-photo-large" src="" alt="Profile" style="display: none;">
+                                <div class="profile-placeholder-large" id="profilePlaceholderEdit">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <h2 class="edit-mode-title">Edit Profil Anda</h2>
+                        </div>
+                        
+                        <div class="profile-edit-form">
+                            <div class="edit-form-grid">
+                                <div class="edit-form-group">
+                                    <label>Nama Lengkap</label>
+                                    <input type="text" id="editNamaLengkap" placeholder="Nama lengkap">
+                                </div>
+                                
+                                <div class="edit-form-group">
+                                    <label>Tempat Lahir</label>
+                                    <input type="text" id="editTempatLahir" placeholder="Kota kelahiran">
+                                </div>
+                                
+                                <div class="edit-form-group">
+                                    <label>Tanggal Lahir</label>
+                                    <input type="date" id="editTanggalLahir">
+                                </div>
+                                
+                                <div class="edit-form-group">
+                                    <label>Golongan Darah</label>
+                                    <select id="editGolonganDarah">
+                                        <option value="">Pilih golongan darah</option>
+                                        <option value="A">A</option>
+                                        <option value="B">B</option>
+                                        <option value="AB">AB</option>
+                                        <option value="O">O</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="edit-form-group">
+                                    <label>Tinggi Badan (cm)</label>
+                                    <input type="number" id="editTinggiBadan" placeholder="170">
+                                </div>
+                                
+                                <div class="edit-form-group">
+                                    <label>Berat Badan (kg)</label>
+                                    <input type="number" step="0.1" id="editBeratBadan" placeholder="70">
+                                </div>
+                                
+                                <div class="edit-form-group full-width">
+                                    <label>Nomor WhatsApp</label>
+                                    <input type="tel" id="editNomorWA" placeholder="08123456789">
+                                </div>
+                            </div>
+                            
+                            <div id="editProfileError" class="error-message"></div>
+                            <div id="editProfileSuccess" class="success-message" style="display: none;"></div>
+                            
+                            <div class="edit-form-actions">
+                                <button class="btn-cancel-edit" onclick="switchToViewMode()">
+                                    ❌ Batal
+                                </button>
+                                <button class="btn-save-profile" onclick="saveProfileChanges()">
+                                    💾 Simpan Perubahan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Steps Modal -->
+        <div id="stepsModal" class="modal">
+            <div class="modal-content modal-large">
+                <button class="modal-close" onclick="closeStepsModal()">&times;</button>
+                <h3>👣 Hitung Langkah</h3>
+                <div class="modal-body">
+                    <div class="input-section">
+                        <label>Tambah Langkah Kaki:</label>
+                        <div class="input-with-btn">
+                            <input type="number" id="stepsInput" placeholder="Misal: 5000">
+                            <button class="btn-add" onclick="addSteps()">Tambah</button>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-display">
+                        <div class="stat-box">
+                            <div class="stat-icon">👣</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalStepsToday">0</span>
+                                <span class="stat-text">Total Langkah Hari Ini</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-analysis">
+                        <h4>🤖 Analisis AI - Aktivitas Langkah Kaki</h4>
+                        <div class="ai-box" id="stepsAIAnalysis">
+                            <p>Tambahkan data langkah kaki untuk mendapatkan analisis cerdas dari AI!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="history-section">
+                        <h4>📅 Riwayat Langkah</h4>
+                        <div id="stepsHistory" class="history-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Running Modal -->
+        <div id="runningModal" class="modal">
+            <div class="modal-content modal-large">
+                <button class="modal-close" onclick="closeRunningModal()">&times;</button>
+                <h3>🏃 Track Lari</h3>
+                <div class="modal-body">
+                    <div class="input-section">
+                        <label>Tambah Jarak Lari (km):</label>
+                        <div class="input-with-btn">
+                            <input type="number" step="0.1" id="runningInput" placeholder="Misal: 5.5">
+                            <button class="btn-add" onclick="addRunning()">Tambah</button>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-display">
+                        <div class="stat-box">
+                            <div class="stat-icon">🏃</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalDistanceToday">0</span>
+                                <span class="stat-text">Total KM Hari Ini</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-analysis">
+                        <h4>🤖 Analisis AI - Performa Lari</h4>
+                        <div class="ai-box" id="runningAIAnalysis">
+                            <p>Tambahkan data lari untuk mendapatkan analisis performa dari AI!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="history-section">
+                        <h4>📅 Riwayat Lari</h4>
+                        <div id="runningHistory" class="history-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Water Modal -->
+        <div id="waterModal" class="modal">
+            <div class="modal-content modal-large">
+                <button class="modal-close" onclick="closeWaterModal()">&times;</button>
+                <h3>💧 Hitung Air</h3>
+                <div class="modal-body">
+                    <div class="input-section">
+                        <label>Konsumsi Air (gelas/liter):</label>
+                        <div class="input-with-btn">
+                            <input type="number" step="0.1" id="waterInput" placeholder="Misal: 1 gelas = 0.25L">
+                            <select id="waterUnit">
+                                <option value="gelas">Gelas (250ml)</option>
+                                <option value="liter">Liter</option>
+                            </select>
+                            <button class="btn-add" onclick="addWater()">Tambah</button>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-display">
+                        <div class="stat-box">
+                            <div class="stat-icon">💧</div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalWaterToday">0</span>
+                                <span class="stat-text">Total Liter Hari Ini</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="water-progress">
+                        <h4>📊 Progress Harian</h4>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="waterProgressBar"></div>
+                        </div>
+                        <p><span id="currentWater">0</span> / <span id="targetWater">2.0</span> Liter</p>
+                    </div>
+                    
+                    <div class="ai-analysis">
+                        <h4>🤖 Rekomendasi AI untuk Hidrasi</h4>
+                        <div class="ai-box" id="waterAI">
+                            <p>Tambahkan konsumsi air Anda untuk mendapatkan rekomendasi personal dari AI!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="history-section">
+                        <h4>📅 Riwayat Konsumsi Air</h4>
+                        <div id="waterHistory" class="history-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gym Modal -->
+        <div id="gymModal" class="modal">
+            <div class="modal-content modal-large">
+                <button class="modal-close" onclick="closeGymModal()">&times;</button>
+                <h3>🏋️ Gym Tracker</h3>
+                <div class="modal-body">
+                    <div class="input-section">
+                        <label>Kategori Latihan:</label>
+                        <select id="exerciseCategorySelect" onchange="updateExerciseTypes()">
+                            <option value="">Pilih kategori latihan</option>
+                            <option value="cardio">🏃 Cardio & Aerobik</option>
+                            <option value="strength">🏋️ Strength Training</option>
+                            <option value="functional">🤸 Functional Training</option>
+                            <option value="flexibility">🧘 Flexibility & Recovery</option>
+                            <option value="sports">⚽ Sports & Martial Arts</option>
+                            <option value="aquatic">🏊 Aquatic Exercise</option>
+                            <option value="group">👥 Group Classes</option>
+                        </select>
+                    </div>
+                    <div class="input-section">
+                        <label>Jenis Latihan Spesifik:</label>
+                        <select id="exerciseTypeSelect">
+                            <option value="">Pilih kategori dulu</option>
+                        </select>
+                    </div>
+                    <div class="input-section">
+                        <label>Durasi (menit):</label>
+                        <div class="input-with-btn">
+                            <input type="number" id="durationInput" placeholder="Misal: 45">
+                            <button class="btn-add" onclick="addGymSession()">Tambah</button>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-analysis">
+                        <h4>🤖 Analisis AI - Program Latihan</h4>
+                        <div class="ai-box" id="gymAI">
+                            <p>Tambahkan sesi gym untuk mendapatkan rekomendasi program latihan dari AI!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="history-section">
+                        <h4>📅 Riwayat Gym</h4>
+                        <div id="gymHistory" class="history-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sleep Modal -->
+        <div id="sleepModal" class="modal">
+            <div class="modal-content modal-large">
+                <button class="modal-close" onclick="closeSleepModal()">&times;</button>
+                <h3>😴 Hitung Tidur</h3>
+                <div class="modal-body">
+                    <div class="input-section">
+                        <label>Durasi Tidur Semalam (jam):</label>
+                        <div class="input-with-btn">
+                            <input type="number" step="0.5" id="sleepInput" placeholder="Misal: 7.5">
+                            <button class="btn-add" onclick="addSleep()">Tambah</button>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-analysis">
+                        <h4>🤖 Analisis Kualitas Tidur dari AI</h4>
+                        <div class="ai-box" id="sleepAI">
+                            <p>Catat durasi tidur Anda untuk mendapatkan analisis lengkap dari AI!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="history-section">
+                        <h4>📅 Riwayat Tidur</h4>
+                        <div id="sleepHistory" class="history-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Food Modal -->
+        <div id="foodModal" class="modal">
+            <div class="modal-content modal-large">
+                <button class="modal-close" onclick="closeFoodModal()">&times;</button>
+                <h3>🍽️ Hitung Makan</h3>
+                <div class="modal-body">
+                    <div class="input-section">
+                        <label>Makanan yang Dikonsumsi:</label>
+                        <input type="text" id="foodNameInput" placeholder="Nama makanan">
+                        <div class="input-grid">
+                            <input type="number" id="foodCalorieInput" placeholder="Kalori">
+                            <input type="number" id="foodCarbInput" placeholder="Karbohidrat (g)">
+                            <input type="number" id="foodProteinInput" placeholder="Protein (g)">
+                            <input type="number" id="foodFatInput" placeholder="Lemak (g)">
+                        </div>
+                        
+                        <button class="btn-camera" onclick="detectFoodFromPhoto()">📸 Deteksi dari Foto</button>
+                        <button class="btn-add" onclick="addFood()">Tambah Makanan</button>
+                    </div>
+                    
+                    <div class="ai-analysis">
+                        <h4>🤖 Analisis Nutrisi AI</h4>
+                        <div class="ai-box" id="foodAI">
+                            <p>Tambahkan makanan untuk mendapatkan analisis nutrisi detail dari AI!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="history-section">
+                        <h4>📅 Riwayat Makanan</h4>
+                        <div id="foodHistory" class="history-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- ========== WEIGHT INPUT MODAL ========== -->
+    <div id="weightInputModal" class="modal">
+        <div class="modal-content modal-medium-wide">
+            <button class="modal-close" onclick="closeWeightInputModal()">&times;</button>
+            
+            <div class="modal-header">
+                <h3>⚖️ Input Berat Badan</h3>
+                <p>Catat perkembangan berat badan Anda</p>
+            </div>
+            
+            <div class="modal-body">
+                <form id="weightInputForm" onsubmit="saveWeightData(event)">
+                    <div class="form-group">
+                        <label for="weightDate">Tanggal Pengukuran <span class="required">*</span></label>
+                        <input type="date" id="weightDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="weightValue">Berat Badan <span class="required">*</span></label>
+                        <div class="input-with-unit">
+                            <input type="number" id="weightValue" step="0.1" min="20" max="300" 
+                                   placeholder="70.5" required>
+                            <span class="unit">kg</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="weightTime">Waktu Pengukuran (Opsional)</label>
+                        <select id="weightTime">
+                            <option value="">Pilih waktu</option>
+                            <option value="pagi">Pagi (setelah bangun tidur)</option>
+                            <option value="siang">Siang</option>
+                            <option value="sore">Sore</option>
+                            <option value="malam">Malam (sebelum tidur)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="weightNote">Catatan (Opsional)</label>
+                        <textarea id="weightNote" rows="3" 
+                                  placeholder="Contoh: Setelah olahraga, setelah makan, kondisi perut kosong, dll..."></textarea>
+                    </div>
+                    
+                    <!-- Weight Change Preview -->
+                    <div id="weightChangePreview" class="weight-change-preview" style="display: none;">
+                        <div class="preview-card">
+                            <div class="preview-icon" id="previewIcon">📊</div>
+                            <div class="preview-content">
+                                <div class="preview-change" id="previewChange">+0.5 kg</div>
+                                <div class="preview-text" id="previewText">dari pengukuran terakhir</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeWeightInputModal()">Batal</button>
+                        <button type="submit" class="btn-primary">💾 Simpan Data</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== WEIGHT HISTORY MODAL ========== -->
+    <div id="weightHistoryModal" class="modal">
+        <div class="modal-content modal-extra-wide">
+            <button class="modal-close" onclick="closeWeightHistoryModal()">&times;</button>
+            
+            <div class="modal-header">
+                <h3>📊 Riwayat Berat Badan Lengkap</h3>
+                <p>Lihat semua progress berat badan Anda</p>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Summary Stats -->
+                <div class="history-summary-stats">
+                    <div class="summary-stat-card">
+                        <div class="summary-icon">📉</div>
+                        <div class="summary-content">
+                            <div class="summary-value" id="summaryTotalChange">0 kg</div>
+                            <div class="summary-label">Total Perubahan</div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-stat-card">
+                        <div class="summary-icon">📅</div>
+                        <div class="summary-content">
+                            <div class="summary-value" id="summaryTotalEntries">0</div>
+                            <div class="summary-label">Total Entri</div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-stat-card">
+                        <div class="summary-icon">⚡</div>
+                        <div class="summary-content">
+                            <div class="summary-value" id="summaryAvgChange">0 kg/minggu</div>
+                            <div class="summary-label">Rata-rata Perubahan</div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-stat-card">
+                        <div class="summary-icon">🎯</div>
+                        <div class="summary-content">
+                            <div class="summary-value" id="summaryProgress">0%</div>
+                            <div class="summary-label">Progress ke Target</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Full Chart -->
+                <div class="chart-section">
+                    <div class="chart-header">
+                        <h4>📈 Grafik Progress</h4>
+                        <div class="chart-controls">
+                            <button class="chart-filter-btn active" onclick="filterWeightChart('all')">Semua</button>
+                            <button class="chart-filter-btn" onclick="filterWeightChart('30')">30 Hari</button>
+                            <button class="chart-filter-btn" onclick="filterWeightChart('90')">90 Hari</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="weightFullChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- History Table -->
+                <div class="history-table-section">
+                    <div class="table-header">
+                        <h4>📋 Riwayat Detail</h4>
+                        <button class="btn-export" onclick="exportWeightData()">
+                            📥 Export CSV
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table id="weightHistoryTable" class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Waktu</th>
+                                    <th>Berat (kg)</th>
+                                    <th>Perubahan</th>
+                                    <th>Catatan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="weightHistoryTableBody">
+                                <tr>
+                                    <td colspan="6" class="no-data">Belum ada data</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Libraries (di <head> atau sebelum </body>) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Supabase Integration -->
+    <script src="supabase-integration.js"></script>
+    <script src="supabase-activity-sync.js"></script>  <!-- ⭐ TARUH DI SINI -->
+
+    <!-- Weight Tracker -->
+    <script src="weight-tracker-integrated.js"></script>
+    <script src="weight-tracker-expose.js"></script>
+
+    <!-- Main App -->
+    <script src="index.js"></script>
+    <script src="registration-handler.js"></script>
+    <script src="complete-profile-auto-highlight.js"></script>
+
+<script>
+// ============================================
+// COMPLETE WEIGHT TRACKER - FINAL FIXED
+// ============================================
+
+console.log('🔧 Loading COMPLETE weight tracker...');
+
+// ============================================
+// MODAL FUNCTIONS
+// ============================================
+
+window.openWeightInputModal = function() {
+    const modal = document.getElementById('weightInputModal');
+    if (!modal) { alert('❌ Modal tidak ditemukan!'); return; }
+    modal.classList.add('active');
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('weightDate').value = today;
+    document.getElementById('weightDate').max = today;
+    document.getElementById('weightValue').value = '';
+    document.getElementById('weightNote').value = '';
+    if (document.getElementById('weightTime')) document.getElementById('weightTime').value = '';
+};
+
+window.closeWeightInputModal = function() {
+    const modal = document.getElementById('weightInputModal');
+    if (modal) modal.classList.remove('active');
+};
+
+window.saveWeightData = function(event) {
+    if (event) event.preventDefault();
+    const date = document.getElementById('weightDate').value;
+    const weight = parseFloat(document.getElementById('weightValue').value);
+    const time = document.getElementById('weightTime')?.value || '';
+    const note = document.getElementById('weightNote')?.value || '';
+    if (!date) { alert('❌ Pilih tanggal!'); return; }
+    if (!weight || weight <= 0) { alert('❌ Masukkan berat badan yang valid!'); return; }
+    if (weight < 30 || weight > 300) { alert('❌ Berat badan harus antara 30-300 kg!'); return; }
+    
+    // ⭐ Gunakan key per-user
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const userId = currentUser.id || currentUser.email || 'guest';
+    const storageKey = `weightTracking_${userId}`;
+    
+    let weightData = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    const newEntry = { date, weight, time, note, timestamp: new Date().toISOString() };
+    const existingIndex = weightData.findIndex(e => e.date === date);
+    
+    if (existingIndex >= 0) {
+        if (confirm('Data tanggal ini sudah ada. Timpa?')) weightData[existingIndex] = newEntry;
+        else return;
+    } else {
+        weightData.push(newEntry);
+    }
+    
+    weightData.sort((a, b) => new Date(b.date) - new Date(a.date));
+    localStorage.setItem(storageKey, JSON.stringify(weightData));
+    window.closeWeightInputModal();
+    alert('✅ Data berhasil disimpan!');
+    location.reload();
+};
+
+window.deleteWeightEntry = function(date) {
+    if (!confirm('Hapus data tanggal ' + date + '?')) return;
+    
+    // ⭐ Gunakan key per-user
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const userId = currentUser.id || currentUser.email || 'guest';
+    const storageKey = `weightTracking_${userId}`;
+    
+    let weightData = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    weightData = weightData.filter(e => e.date !== date);
+    localStorage.setItem(storageKey, JSON.stringify(weightData));
+    alert('✅ Data dihapus!');
+    location.reload();
+};
+
+// ============================================
+// UPDATE ALL DISPLAYS
+// ============================================
+
+function updateAllDisplays() {
+    console.log('🔄 Updating all displays...');
+    
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    
+    // ⭐ Gunakan key per-user
+    const userId = currentUser.id || currentUser.email || 'guest';
+    const storageKey = `weightTracking_${userId}`;
+    const weightData = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    
+    const goal = currentUser.goal || 'maintain';
+    
+    const beratAwal = parseFloat(
+        currentUser.beratBadan || 
+        currentUser.beratBadanAwal || 
+        currentUser.googleBeratBadanAwal || 
+        0
+    );
+    
+    const targetWeight = parseFloat(
+        currentUser.beratBadanTarget || 
+        currentUser.googleBeratBadanTarget || 
+        0
+    );
+    
+    const beratSekarang = weightData.length > 0 ? weightData[0].weight : beratAwal;
+    const tetap = beratSekarang - beratAwal;
+    
+    // Calculate sisa based on goal (for passing to updateTrackingCards)
+    let sisa = 0;
+    if (goal === 'maintain') {
+        sisa = Math.abs(beratSekarang - targetWeight);
+    } else if (goal === 'turun') {
+        sisa = beratSekarang - targetWeight;
+    } else if (goal === 'naik') {
+        sisa = targetWeight - beratSekarang;
+    } else {
+        sisa = Math.abs(beratSekarang - targetWeight);
+    }
+    
+    console.log('📐 Values:', { beratAwal, beratSekarang, targetWeight, tetap, sisa, goal });
+    
+    updateTrackingCards(beratAwal, beratSekarang, targetWeight, tetap, sisa);
+    updateWeightHistory(weightData);
+    updateWeightChart(weightData);
+    
+    console.log('✅ All updated!');
+}
+
+// ============================================
+// UPDATE TRACKING CARDS
+// ============================================
+
+function updateTrackingCards(beratAwal, beratSekarang, targetWeight, tetap, sisa) {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const goal = currentUser.goal || 'maintain';
+    
+    // ===== UPDATE BY ID - LANGSUNG! =====
+    
+    // 1. Update weightChange (Tetap)
+    const weightChangeEl = document.getElementById('weightChange');
+    if (weightChangeEl) {
+        let changeText = '';
+        if (Math.abs(tetap) < 0.1) {
+            changeText = '0 kg';
+        } else {
+            changeText = tetap >= 0 ? `+${tetap.toFixed(1)} kg` : `${tetap.toFixed(1)} kg`;
+        }
+        weightChangeEl.textContent = changeText;
+        weightChangeEl.style.color = tetap > 0.1 ? '#ef4444' : tetap < -0.1 ? '#10b981' : '#6b7280';
+        weightChangeEl.style.fontWeight = '700';
+        console.log('✅ Updated weightChange:', changeText);
+    }
+    
+    // 2. Update weightRemaining (Sisa)
+    const weightRemainingEl = document.getElementById('weightRemaining');
+    if (weightRemainingEl) {
+        let sisaText = '';
+        
+        if (goal === 'maintain') {
+            const sisaValue = Math.abs(beratSekarang - targetWeight);
+            sisaText = sisaValue < 0.5 ? 'Sisa: ✅ Tercapai' : `Sisa: ${sisaValue.toFixed(1)} kg`;
+        } else if (goal === 'turun') {
+            const sisaValue = beratSekarang - targetWeight;
+            sisaText = sisaValue <= 0 ? 'Sisa: ✅ Target tercapai!' : `Sisa: ${sisaValue.toFixed(1)} kg`;
+        } else if (goal === 'naik') {
+            const sisaValue = targetWeight - beratSekarang;
+            sisaText = sisaValue <= 0 ? 'Sisa: ✅ Target tercapai!' : `Sisa: ${sisaValue.toFixed(1)} kg`;
+        } else {
+            const sisaValue = Math.abs(beratSekarang - targetWeight);
+            sisaText = sisaValue < 0.5 ? 'Sisa: ✅ Tercapai' : `Sisa: ${sisaValue.toFixed(1)} kg`;
+        }
+        
+        weightRemainingEl.textContent = sisaText;
+        weightRemainingEl.style.color = '#f59e0b';
+        weightRemainingEl.style.fontWeight = '700';
+        console.log('✅ Updated weightRemaining:', sisaText);
+    }
+    
+    // 3. Update other elements with generic approach (for backwards compatibility)
+    const allElements = document.querySelectorAll('*');
+    
+    allElements.forEach(el => {
+        if (el.children.length > 0) return;
+        if (el.id === 'weightChange' || el.id === 'weightRemaining') return; // Skip sudah diupdate
+        
+        const text = el.textContent.trim();
+        const parent = el.parentElement;
+        const parentText = parent?.textContent || '';
+        
+        if (text === '-' || text === '- kg' || text === '-kg' || text.match(/^-\s*kg$/)) {
+            if (parentText.includes('Berat Awal') || parentText.includes('Awal')) {
+                if (beratAwal > 0) el.textContent = beratAwal.toFixed(1);
+            }
+            else if (parentText.includes('Sekarang') || parentText.includes('Saat Ini')) {
+                el.textContent = beratSekarang.toFixed(1);
+            }
+            else if (parentText.includes('Target') && !parentText.includes('Sisa')) {
+                if (targetWeight > 0) el.textContent = targetWeight.toFixed(1);
+            }
+        }
+    });
+}
+
+// ============================================
+// UPDATE TETAP
+// ============================================
+
+function updateTetapIndicator(tetap) {
+    // DEPRECATED: Function logic moved to updateTrackingCards() untuk direct ID access
+    // Keeping function untuk backwards compatibility tapi tidak melakukan apa-apa
+    console.log('📊 updateTetapIndicator called (deprecated - now handled by updateTrackingCards)');
+}
+
+// ============================================
+// CHART
+// ============================================
+
+let weightChartInstance = null;
+
+function updateWeightChart(weightDataParam) {
+    // ⭐ FIXED: Handle jika dipanggil tanpa parameter
+    let data = weightDataParam;
+    
+    if (!data) {
+        if (typeof weightData !== 'undefined' && Array.isArray(weightData)) {
+            data = weightData;
+        } else {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const userId = currentUser.id || currentUser.email || 'guest';
+            const storageKey = `weightTracking_${userId}`;
+            data = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        }
+    }
+    
+    const canvas = document.querySelector('canvas');
+    if (!canvas || !data || data.length === 0) return;
+    
+    const chartData = data.slice(0, 7).reverse();
+    const labels = chartData.map(e => {
+        const d = new Date(e.date);
+        return `${d.getDate()}/${d.getMonth() + 1}`;
+    });
+    const values = chartData.map(e => e.weight);
+    
+    if (weightChartInstance) weightChartInstance.destroy();
+    
+    weightChartInstance = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Berat Badan (kg)',
+                data: values,
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: '#667eea',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: { callback: v => v + ' kg' }
+                }
+            }
+        }
+    });
+}
+
+// ============================================
+// HISTORY
+// ============================================
+
+// Helper function untuk format berat tanpa .0
+function formatWeightInline(value) {
+    if (value === null || value === undefined || isNaN(value)) return '-';
+    const num = parseFloat(value);
+    return num % 1 === 0 ? num.toString() : num.toFixed(1);
+}
+
+function updateWeightHistory(weightDataParam) {
+    // ⭐ FIXED: Handle jika dipanggil tanpa parameter
+    let data = weightDataParam;
+    
+    // Jika tidak ada parameter, coba ambil dari global atau localStorage
+    if (!data) {
+        if (typeof weightData !== 'undefined' && Array.isArray(weightData)) {
+            data = weightData;
+        } else {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const userId = currentUser.id || currentUser.email || 'guest';
+            const storageKey = `weightTracking_${userId}`;
+            data = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        }
+    }
+    
+    const historyContainer = document.querySelector('.weight-history-list') || 
+                           document.querySelector('#weightHistoryList') ||
+                           document.querySelector('[data-weight-history]');
+    
+    if (!historyContainer) return;
+    
+    if (!data || data.length === 0) {
+        historyContainer.innerHTML = '<div style="text-align:center;padding:40px;color:#6b7280;"><div style="font-size:3rem;">📊</div><p>Belum ada data</p></div>';
+        return;
+    }
+    
+    let html = '';
+    data.slice(0, 7).forEach((entry, index) => {
+        const change = index < data.length - 1 ? entry.weight - data[index + 1].weight : 0;
+        const changeColor = change > 0 ? '#ef4444' : change < 0 ? '#10b981' : '#6b7280';
+        const changeIcon = change > 0 ? '📈' : change < 0 ? '📉' : '➡️';
+        const changeText = change !== 0 ? `${change > 0 ? '+' : ''}${formatWeightInline(change)} kg` : 'Data pertama';
+        
+        html += `<div style="background:white;padding:12px;border-radius:8px;border:1px solid #e5e7eb;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+                <div style="font-weight:700;font-size:1.1rem;color:#1f2937;">${formatWeightInline(entry.weight)} kg</div>
+                <div style="font-size:0.85rem;color:#6b7280;margin-top:2px;">📅 ${new Date(entry.date).toLocaleDateString('id-ID', {day:'numeric',month:'short',year:'numeric'})} ${entry.time ? '• ⏰ ' + entry.time : ''}</div>
+                ${entry.note ? '<div style="font-size:0.8rem;color:#9ca3af;margin-top:2px;">📝 ' + entry.note + '</div>' : ''}
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <div style="color:${changeColor};font-weight:600;font-size:0.9rem;">${changeIcon} ${changeText}</div>
+                <button onclick="deleteWeightEntry('${entry.date}')" style="background:#ef4444;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:0.8rem;">🗑️</button>
+            </div>
+        </div>`;
+    });
+    
+    historyContainer.innerHTML = html;
+}
+
+// ============================================
+// INIT
+// ============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => updateAllDisplays(), 1000);
+});
+
+window.addEventListener('load', () => {
+    setTimeout(() => updateAllDisplays(), 1500);
+});
+
+console.log('✅ COMPLETE weight tracker loaded!');
+
+
+
+</script>
+
+    <!-- Register Form Progress Highlight -->
+    <script src="register-progress-highlight.js"></script>
+
+    </body>
+</html>

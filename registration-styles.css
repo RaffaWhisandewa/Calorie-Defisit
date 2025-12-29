@@ -1,0 +1,571 @@
+/* ========================================
+   ADDITIONAL STYLES FOR COMPLETE REGISTRATION
+   Optimized for Readability & Contrast
+   ======================================== */
+
+/* Form Sections */
+.form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #1a202c;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.section-description {
+    font-size: 0.95rem;
+    color: #4a5568;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.required {
+    color: #dc2626;
+    margin-left: 3px;
+    font-weight: 700;
+}
+
+/* Form Rows */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Radio Group - Gender Selection */
+.radio-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.radio-option {
+    flex: 1;
+    cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+    display: none;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border: 2px solid #d1d5db;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    color: #374151;
+}
+
+.radio-icon {
+    font-size: 1.5rem;
+}
+
+.radio-option input[type="radio"]:checked + .radio-label {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+    color: #ffffff;
+    transform: scale(1.02);
+}
+
+.radio-option:hover .radio-label {
+    border-color: #9ca3af;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Input with Unit */
+.input-with-unit {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-unit input {
+    padding-right: 55px;
+}
+
+.input-with-unit .unit {
+    position: absolute;
+    right: 15px;
+    color: #6b7280;
+    font-weight: 700;
+    font-size: 0.9rem;
+    pointer-events: none;
+    background: #f3f4f6;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* Goal Setting Section */
+.goal-section {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 1rem;
+}
+
+.goal-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+    .goal-options {
+        grid-template-columns: 1fr;
+    }
+}
+
+.goal-card {
+    cursor: pointer;
+    position: relative;
+}
+
+.goal-card input[type="radio"] {
+    display: none;
+}
+
+.goal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: #ffffff;
+    border: 3px solid #e5e7eb;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    height: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.goal-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.goal-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 0.25rem;
+    color: #1f2937;
+}
+
+.goal-desc {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+.goal-card input[type="radio"]:checked + .goal-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
+    transform: translateY(-6px) scale(1.03);
+}
+
+.goal-card input[type="radio"]:checked + .goal-content .goal-title {
+    color: #ffffff;
+}
+
+.goal-card input[type="radio"]:checked + .goal-content .goal-desc {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.goal-card:hover .goal-content {
+    border-color: #9ca3af;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Goal Preview */
+.goal-preview {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.preview-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.preview-icon {
+    font-size: 1.5rem;
+}
+
+.preview-header h4 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.preview-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.preview-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.preview-label {
+    color: #4b5563;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.preview-value {
+    font-weight: 700;
+    color: #1f2937;
+    font-size: 1.05rem;
+}
+
+.preview-value.highlight {
+    color: #667eea;
+    font-size: 1.3rem;
+    text-shadow: 0 1px 3px rgba(102, 126, 234, 0.3);
+}
+
+.preview-note {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #374151;
+    text-align: center;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+/* Large Button */
+.btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+}
+
+.btn-large span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* Progress Steps */
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #e5e7eb;
+    z-index: 0;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer; /* Clickable */
+    transition: all 0.3s ease;
+}
+
+.step:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    border: 3px solid #d1d5db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #6b7280;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.step-label {
+    font-size: 0.9rem;
+    color: #6b7280;
+    text-align: center;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+    transform: scale(1.1);
+}
+
+.step.active .step-label {
+    color: #1f2937;
+    font-weight: 700;
+}
+
+.step.completed .step-number {
+    background: #10b981;
+    border-color: #10b981;
+    color: #ffffff;
+}
+
+.step.completed .step-number::after {
+    content: '✓';
+}
+
+.step.completed .step-label {
+    color: #10b981;
+    font-weight: 600;
+}
+
+/* Progress line animation */
+.progress-steps::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(to right, #10b981, #667eea);
+    z-index: 0;
+    width: 0%;
+    transition: width 0.5s ease;
+}
+
+.progress-steps.step-1::after {
+    width: 0%;
+}
+
+.progress-steps.step-2::after {
+    width: 50%;
+}
+
+.progress-steps.step-3::after {
+    width: 100%;
+}
+
+/* Card Auth Expanded */
+.card-auth {
+    max-width: 700px; /* Lebih lebar untuk form lengkap */
+}
+
+/* Scrollable Form Container */
+.form-container {
+    max-height: 80vh; /* Diperbesar dari 70vh ke 80vh */
+    overflow-y: auto;
+    padding-right: 10px;
+    scroll-behavior: smooth;
+    position: relative;
+}
+
+.form-container::-webkit-scrollbar {
+    width: 10px; /* Diperbesar dari 8px ke 10px agar lebih mudah di-klik */
+}
+
+.form-container::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 5px;
+}
+
+.form-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 5px;
+    border: 2px solid #f3f4f6; /* Tambahkan border untuk lebih jelas */
+}
+
+.form-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
+    cursor: pointer;
+}
+
+/* Animations */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-section {
+    animation: slideInUp 0.4s ease-out;
+}
+
+.form-section:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.form-section:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.form-section:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .card-auth {
+        max-width: 100%;
+        margin: 0.5rem; /* Kurangi margin di mobile */
+        padding: 1.5rem; /* Kurangi padding untuk space lebih */
+    }
+    
+    .form-container {
+        max-height: 75vh; /* Lebih tinggi di mobile */
+        padding-right: 5px;
+    }
+    
+    .form-section {
+        padding: 1rem 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .goal-icon {
+        font-size: 2rem;
+    }
+    
+    .goal-title {
+        font-size: 0.9rem;
+    }
+    
+    .progress-steps {
+        flex-direction: row; /* Tetap horizontal di mobile */
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        overflow-x: auto; /* Allow horizontal scroll jika perlu */
+    }
+    
+    .step {
+        min-width: 80px; /* Prevent steps dari terlalu kecil */
+    }
+    
+    .step-label {
+        font-size: 0.75rem;
+    }
+    
+    .progress-steps::before {
+        display: block; /* Tetap tampilkan di mobile */
+    }
+}
+
+/* Success State Feedback */
+.form-group.success input,
+.form-group.success select {
+    border-color: #10b981;
+    background-color: #f0fdf4;
+}
+
+.form-group.error input,
+.form-group.error select {
+    border-color: #dc2626;
+    background-color: #fef2f2;
+}
+
+/* Tooltip for Help */
+.help-tooltip {
+    position: relative;
+    display: inline-block;
+    margin-left: 5px;
+    cursor: help;
+}
+
+.help-tooltip::after {
+    content: '?';
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: #667eea;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 18px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.help-tooltip:hover::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 12px;
+    background: #1f2937;
+    color: #ffffff;
+    border-radius: 6px;
+    font-size: 13px;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
